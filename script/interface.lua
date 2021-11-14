@@ -37,6 +37,11 @@ remote.add_interface("logistic-train-network", {
   on_provider_unscheduled_cargo = function() return on_provider_unscheduled_cargo_alert end,
   on_requester_unscheduled_cargo = function() return on_requester_unscheduled_cargo_alert end,
   on_requester_remaining_cargo = function() return on_requester_remaining_cargo_alert end,
+  
+  ------
+  -- Commands to the dispatcher
+  train_arrives = TrainArrives,
+  
 })
 
 
@@ -183,4 +188,12 @@ Raised when trains leave requester with remaining cargo
   event.station
   remaining_load = { [item], count } }
 
+
+----  COMMANDS  ----
+train_arrives( train, virtual_stop )
+Used to notify LTN a train has arrived at an LTN stop, even if it did not path to it
+-> Arguments:
+  train := LuaTrain
+  virtual_stop := LuaEntity(TrainStop)
+  
 --]]

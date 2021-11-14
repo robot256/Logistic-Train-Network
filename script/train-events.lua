@@ -6,8 +6,15 @@
 
 
 -- update stop output when train enters stop
-function TrainArrives(train)
-  local stopID = train.station.unit_number
+function TrainArrives(train, virtual_stop)
+  local stopID = nil
+
+  if virtual_stop then
+    stopID = virtual_stop.unit_number
+  else
+    stopID = train.station.unit_number
+  end
+
   local stop = global.LogisticTrainStops[stopID]
   if stop then
     local stop_name = stop.entity.backer_name
