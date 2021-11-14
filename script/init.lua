@@ -34,6 +34,9 @@ local function initialize(oldVersion, newVersion)
 
   ---- initialize stops
   global.LogisticTrainStops = global.LogisticTrainStops or {}
+  
+  ---- initialize routes
+  global.SurfaceLinks = global.SurfaceLinks or {}
 
   -- clean obsolete global
   global.Dispatcher.Requested = nil

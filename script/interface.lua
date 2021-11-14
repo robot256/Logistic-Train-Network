@@ -39,6 +39,26 @@ remote.add_interface("logistic-train-network", {
   on_provider_unscheduled_cargo = function() return on_provider_unscheduled_cargo_alert end,
   on_requester_unscheduled_cargo = function() return on_requester_unscheduled_cargo_alert end,
   on_requester_remaining_cargo = function() return on_requester_remaining_cargo_alert end,
+  
+  -- Commands
+  link_surfaces = function(event)
+    global.SurfaceLinks[event.id1] = global.SurfaceLinks[event.id1] or {}
+    global.SurfaceLinks[event.id1][event.id2] = event.distance
+    global.SurfaceLinks[event.id2] = global.SurfaceLinks[event.id2] or {}
+    global.SurfaceLinks[event.id2][event.id1] = event.distance
+  end)
+    
+  unlink_surfaces = function(event)
+    if global.SurfaceLinks[event.id1] then
+      global.SurfaceLinks[event.id1][event.id2] = nil
+    end
+    if global.SurfaceLinks[event.id2] then
+      global.SurfaceLinks[event.id2][event.id1] = nil
+    end
+  end)
+  
+  update_delivery = function(old_train_id, new_train) OnTrainCreated({old_train_id_1=old_train_id, train=new_train}) end,
+  
 })
 
 
