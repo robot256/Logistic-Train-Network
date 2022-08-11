@@ -43,9 +43,9 @@ remote.add_interface("logistic-train-network", {
   -- Commands
   link_surfaces = function(event)
     global.SurfaceLinks[event.id1] = global.SurfaceLinks[event.id1] or {}
-    global.SurfaceLinks[event.id1][event.id2] = event.distance
+    global.SurfaceLinks[event.id1][event.id2] = {cost=event.distance, network_id=event.network_id or 65535}
     global.SurfaceLinks[event.id2] = global.SurfaceLinks[event.id2] or {}
-    global.SurfaceLinks[event.id2][event.id1] = event.distance
+    global.SurfaceLinks[event.id2][event.id1] = {cost=event.distance, network_id=event.network_id or 65535}
   end)
     
   unlink_surfaces = function(event)

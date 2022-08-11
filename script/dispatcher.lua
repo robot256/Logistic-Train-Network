@@ -294,10 +294,11 @@ local function getProviders(requestStation, item, req_count, min_length, max_len
       -- log("DEBUG: comparing 0x"..format("%x", band(requestStation.network_id)).." & 0x"..format("%x", band(stop.network_id)).." = 0x"..format("%x", band(matched_networks)) )
 
       if stop.entity.force == force
-      and (stop.entity.surface == surface or   -- path between surfaces only when linked
-           (global.SurfaceLinks[surface.index] and
-            global.SurfaceLinks[surface.index][stop.entity.surface.index]) )
       and matched_networks ~= 0
+      and (stop.entity.surface == surface or   -- path between surfaces only when linked for the given network
+           (global.SurfaceLinks[surface.index] and
+            global.SurfaceLinks[surface.index][stop.entity.surface.index] and
+            band(matched_networks, global.SurfaceLinks[surface.index][stop.entity.surface.index].network_id) ~= 0 ) )
       -- and count >= stop.providing_threshold
       and (stop.min_carriages == 0 or max_length == 0 or stop.min_carriages <= max_length)
       and (stop.max_carriages == 0 or min_length == 0 or stop.max_carriages >= min_length) then --check if provider can actually service trains from requester
@@ -345,8 +346,8 @@ local function getStationDistance(stationA, stationB)
     -- Apply penalty for using cross-surface transportation
     if stationA.surface ~= stationB.surface then
       if (global.SurfaceLinks[stationA.surface.index] and 
-          global.SurfaceLinks[stationA.surface.index][stationB..surface.index]) then
-        dist = dist + global.SurfaceLinks[stationA.surface.index][stationB..surface.index]
+          global.SurfaceLinks[stationA.surface.index][stationB.surface.index]) then
+        dist = dist + global.SurfaceLinks[stationA.surface.index][stationB.surface.index].cost
       end
     end
     
@@ -389,7 +390,8 @@ local function getFreeTrains(nextStop, min_carriages, max_carriages, type, size)
       and trainData.force == nextStop.entity.force -- forces match
       and (trainData.surface == nextStop.entity.surface or   -- pathing between surfaces only when linked
            (global.SurfaceLinks[trainData.surface.index] and
-            global.SurfaceLinks[trainData.surface.index][nextStop.entity.surface.index]) )
+            global.SurfaceLinks[trainData.surface.index][nextStop.entity.surface.index] and
+            band(matched_networks, global.SurfaceLinks[surface.index][stop.entity.surface.index].network_id) ~= 0 ) )
       and btest(trainData.network_id, nextStop.network_id) -- depot is in the same network as requester and provider
       and (min_carriages == 0 or #trainData.train.carriages >= min_carriages) and (max_carriages == 0 or #trainData.train.carriages <= max_carriages) -- train length fits requester and provider limitations
       then
