@@ -12,6 +12,35 @@ script.on_event(defines.events.on_forces_merging, function(event)
       delivery.force = event.destination
     end
   end
+  
+  -- Update surface links assigned to the changing force
+  if global.SurfaceLinks[event.source.index] then
+    -- source force has links
+    local source_links = global.SurfaceLinks[event.source.index]
+    if not global.SurfaceLinks[event.destination.index] then
+      -- destination force has no links, use source link table
+      global.SurfaceLinks[event.destination.index] = global.SurfaceLinks[event.source.index]
+    else
+      -- merge the two link tables. discard links that already exist in the destination table.
+      local dest_links = global.SurfaceLinks[event.destination.index] or {}
+      for surf1_index, surf1_links in pairs(source_links) do
+        if not dest_links[surf1_index] then
+          -- destination does not have any links starting at surf1, so use source table
+          dest_links[surf1_index] = surf1_links
+        else
+          -- destination has some links starting at surf1, check for new ones and ignore source links that are already listed in destination
+          for surf2_index, surf2_link in pairs(surf1_links) do
+            if not dest_links[surf1_index][surf2_index] then
+              dest_links[surf1_index][surf2_index] = surf2_link
+            end
+          end
+        end
+      end
+      global.SurfaceLinks[event.destination.index] = dest_links
+    end
+    -- clear table for force that no longer exists
+    global.SurfaceLinks[event.source.index] = nil
+  end
 end)
 
 

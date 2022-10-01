@@ -41,19 +41,22 @@ remote.add_interface("logistic-train-network", {
   on_requester_remaining_cargo = function() return on_requester_remaining_cargo_alert end,
   
   -- Commands
-  link_surfaces = function(event)
-    global.SurfaceLinks[event.id1] = global.SurfaceLinks[event.id1] or {}
-    global.SurfaceLinks[event.id1][event.id2] = {cost=event.distance, network_id=event.network_id or 65535}
-    global.SurfaceLinks[event.id2] = global.SurfaceLinks[event.id2] or {}
-    global.SurfaceLinks[event.id2][event.id1] = {cost=event.distance, network_id=event.network_id or 65535}
+  -- link = {mod=<String>, force=<LuaForce>, surface1=<LuaSurface>, surface2=<LuaSurface>, cost=<Float>, network_id=<Int>}
+  link_surfaces = function(link)
+    global.SurfaceLinks[link.force.index] = global.SurfaceLinks[link.force.index] or {}
+    global.SurfaceLinks[link.force.index][link.surface1.index] = global.SurfaceLinks[link.force.index][link.surface1.index] or {}
+    global.SurfaceLinks[link.force.index][link.surface1.index][link.surface2.index] = {mod=link.mod, cost=link.cost, network_id=link.network_id or 65535}
+    global.SurfaceLinks[link.force.index][link.surface2.index] = global.SurfaceLinks[link.force.index][surface2.index] or {}
+    global.SurfaceLinks[link.force.index][link.surface2.index][link.surface1.index] = {mod=link.mod, cost=link.cost, network_id=link.network_id or 65535}
   end)
     
-  unlink_surfaces = function(event)
-    if global.SurfaceLinks[event.id1] then
-      global.SurfaceLinks[event.id1][event.id2] = nil
+  -- link = {force=<LuaForce>, surface1=<LuaSurface>, surface2=<LuaSurface>}
+  unlink_surfaces = function(link)
+    if global.SurfaceLinks[force.index] and global.SurfaceLinks[force.index][surface1.index] then
+      global.SurfaceLinks[force.index][surface1.index][surface2.index] = nil
     end
-    if global.SurfaceLinks[event.id2] then
-      global.SurfaceLinks[event.id2][event.id1] = nil
+    if global.SurfaceLinks[force.index] and global.SurfaceLinks[force.index][surface2.index] then
+      global.SurfaceLinks[force.index][surface2.index][surface1.index] = nil
     end
   end)
   
